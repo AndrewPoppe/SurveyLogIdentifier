@@ -30,7 +30,7 @@ class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
         }
 
         $log_event_table = method_exists('REDCap', 'getLogEventTable') ? REDCap::getLogEventTable($project_id) : "redcap_log_event";
-        $msql = "SELECT * FROM $log_event_table WHERE project_id = $project_id ORDER BY log_event_id DESC LIMIT 1";
+        $msql = "SELECT * FROM ".db_escape($log_event_table)." WHERE project_id = ".db_escape($project_id)." ORDER BY log_event_id DESC LIMIT 1";
         $res = db_fetch_array(db_query($msql));
         $descs = array("Create survey response", "Update survey response");
         $params = array('project_id'=>$project_id, 'return format'=>'array', 'records'=>array($record), 'fields'=>array($id_field), 'events'=>array($event_id));
@@ -40,7 +40,7 @@ class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
 
             // Try to just update value in existing log entry
             $log_event_id_orig = $res["log_event_id"];
-            $newsql = "UPDATE $log_event_table SET user='$id' WHERE log_event_id=$log_event_id_orig";
+            $newsql = "UPDATE ".db_escape($log_event_table)." SET user='".db_escape($id)."' WHERE log_event_id=".db_escape($log_event_id_orig);
             $update_res = db_query($newsql);
 
             if (!$update_res) {
