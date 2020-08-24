@@ -21,6 +21,7 @@ After downloading and enabling this module on your REDCap instance, enable it in
 ### Help
 For assistance with this module, contact <ins>Andrew Poppe</ins> either by:
 * using email link in external module description in REDCap: 
+
     ![Image of REDCap Module Description](https://i.imgur.com/foCFAgY.png)
 * opening an issue on github 
 
