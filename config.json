@@ -1,0 +1,48 @@
+{
+    "name": "Survey Log Identifier",
+    "namespace": "SurveyLogIdentifierNamespace\\SurveyLogIdentifier",
+    "description": "This module enables the addition of an identifier into the REDCap logs when data are created or updated in REDCap survey instruments.",
+    "authors": [
+        {
+            "name": "Andrew Poppe",
+            "email": "andrew.poppe@yale.edu",
+            "institution": "Yale University/Yale New Haven Health"
+        }
+    ],
+    "documentation": "https://github.com/AndrewPoppe/SurveyLogIdentifier",
+    "permissions": [
+        "redcap_save_record"
+    ],
+    "system-settings": [],
+    "project-settings": [
+        {
+            "key": "descriptive-text",
+            "name": "Choose the survey(s) you want to add identifiers to as well as the field that will serve as the identifier.",
+            "type": "descriptive"
+        },
+        {
+            "key": "id-field",
+            "name": "The field that holds the identifier that will appear in the logs (leave blank to use project's record ID field). Note, this field must not appear on a repeatable instrument or event",
+            "required": false,
+            "type": "field-list"
+        },
+        {
+            "key": "instrument",
+            "name": "Survey instrument(s) on which to add identifiers (leave blank to apply module to all surveys in the project)",
+            "required": false,
+            "type": "form-list",
+            "repeatable": true
+        },
+        {
+            "key": "id-prefix",
+            "name": "Text to prepend to the identifier value",
+            "required": false,
+            "type": "text",
+            "default": "[survey respondent]: "
+        }
+    ],
+    "compatibility": {
+        "redcap-version-min": "9.3.6"
+    }
+
+}
