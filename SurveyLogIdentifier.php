@@ -17,7 +17,7 @@ class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
         if (is_null($id_field) || $id_field == "") $id_field = REDCap::getRecordIdField();
 
         // get prefix setting
-        $prefix = AbstractExternalModule::getProjectSetting("id-prefix");
+        $prefix = REDCap::escapeHtml(AbstractExternalModule::getProjectSetting("id-prefix"));
         if (is_null($prefix)) $prefix = "[survey respondent]: ";
 
         // get instrument(s) setting
@@ -44,6 +44,11 @@ class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
             $update_res = db_query($newsql);
 
             if (!$update_res) {
+                // Fallback on logEvent from REDCap class
+                REDCap::logEvent($id . "\n" . $desc, $res["data_values"], $res["sql_log"], $res["pk"], "", $res["project_id"]);
+            }
+
+            /*if (!$update_res) {
                 // Create new log row
                 $desc = $res["description"];
                 $new_res = Logging::logEvent($res["sql_log"], 
@@ -66,7 +71,7 @@ class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
                     REDCap::logEvent($desc, $res["data_values"], $res["sql_log"], $res["pk"], "", $res["project_id"]);
                 }
 
-            }
+            }*/
         }
     }
 
