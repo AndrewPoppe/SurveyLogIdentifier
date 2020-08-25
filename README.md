@@ -10,7 +10,7 @@ After downloading and enabling this module on your REDCap instance, enable it in
 *Take care not to include true PHI as your identifier unless you know what you're doing.*
 
     * Leaving the **id field** setting blank will cause the module to use the project's record ID field as the identifier.
-    * Note that the **id field** cannot exist on a repeatable form or repeatable instrument.
+    * Note that the **id field** cannot exist on a repeatable event or repeatable instrument.
 2. The **instrument** setting chooses which survey(s) to apply this module to.
 
     * Leaving the **instrument** setting blank will apply this module to all surveys in the project.
