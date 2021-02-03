@@ -9,9 +9,29 @@ use REDCap;
 
 class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
 
+    // determine whether module should run - returns index of first applicable event
+    function run_module($instrument, $event_id)
+    {
+        print_r('<pre>');
+        $events = AbstractExternalModule::getProjectSetting('event');
+        $instruments = AbstractExternalModule::getProjectSetting("instrument");
+
+        foreach ($events as $i=>$event_setting_id) 
+        {
+            if (array_search($event_id, $events) === false) continue;
+            foreach ($instruments[$i] as $j=>$instrument_setting) 
+            {
+                if ($event_id === $event_setting_id && ($instrument === $instrument_setting || $instrument_setting === "")) return($i);
+            }
+        }
+        return(false);
+    }
+
     function redcap_save_record($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance)
     {
         
+        if (!run_module($instrument, $event_id)) return 0;
+
         // get id-field setting
         $id_field = AbstractExternalModule::getProjectSetting("id-field");
         if (is_null($id_field) || $id_field == "") $id_field = REDCap::getRecordIdField();

@@ -10,35 +10,46 @@
         }
     ],
     "documentation": "https://github.com/AndrewPoppe/SurveyLogIdentifier",
+    "framework-version": 5,
     "permissions": [
-        "redcap_save_record"
+        "redcap_save_record",
+        "redcap_survey_page_top"
     ],
     "system-settings": [],
     "project-settings": [
         {
-            "key": "descriptive-text",
+            "key": "event-instruments",
             "name": "Choose the survey(s) you want to add identifiers to as well as the field that will serve as the identifier.",
-            "type": "descriptive"
-        },
-        {
-            "key": "id-field",
-            "name": "The field that holds the identifier that will appear in the logs (leave blank to use project's record ID field). Note, this field must not appear on a repeatable instrument or event",
-            "required": false,
-            "type": "field-list"
-        },
-        {
-            "key": "instrument",
-            "name": "Survey instrument(s) on which to add identifiers (leave blank to apply module to all surveys in the project)",
-            "required": false,
-            "type": "form-list",
-            "repeatable": true
-        },
-        {
-            "key": "id-prefix",
-            "name": "Text to prepend to the identifier value",
-            "required": false,
-            "type": "text",
-            "default": "[survey respondent]: "
+            "type": "sub_settings",
+            "repeatable": true,
+            "sub_settings": [
+                {
+                    "key": "event",
+                    "name": "Choose the event to which this combination of field and instrument(s) applies",
+                    "type": "event-list",
+                    "required": true
+                },
+                {
+                    "key": "instrument",
+                    "name": "Survey instrument(s) on which to add identifiers (leave blank to apply module to all surveys in the project)",
+                    "required": false,
+                    "type": "form-list",
+                    "repeatable": true
+                },
+                {
+                    "key": "id-field",
+                    "name": "The field that holds the identifier that will appear in the logs (leave blank to use project's record ID field). Note, this field must not appear on a repeatable instrument or event",
+                    "required": false,
+                    "type": "field-list"
+                },
+                {
+                    "key": "id-prefix",
+                    "name": "Text to prepend to the identifier value",
+                    "required": false,
+                    "type": "text",
+                    "default": "[survey respondent]: "
+                }
+            ]
         }
     ],
     "compatibility": {
