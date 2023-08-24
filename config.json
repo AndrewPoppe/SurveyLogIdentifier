@@ -9,10 +9,7 @@
             "institution": "Yale University/Yale New Haven Health"
         }
     ],
-    "documentation": "https://github.com/AndrewPoppe/SurveyLogIdentifier",
-    "permissions": [
-        "redcap_save_record"
-    ],
+    "documentation": "https://github.com/AndrewPoppe/SurveyLogIdentifier/README.md",
     "system-settings": [],
     "project-settings": [
         {
@@ -22,7 +19,7 @@
         },
         {
             "key": "id-field",
-            "name": "The field that holds the identifier that will appear in the logs (leave blank to use project's record ID field). Note, this field must not appear on a repeatable instrument or event",
+            "name": "The field that holds the identifier that will appear in the logs (leave blank to use project's record ID field).<br>Note, this field must not appear on a repeatable instrument or event",
             "required": false,
             "type": "field-list"
         },
@@ -35,14 +32,14 @@
         },
         {
             "key": "id-prefix",
-            "name": "Text to prepend to the identifier value",
+            "name": "Text to prepend to the identifier value<br>If left blank, this defaults to \"[survey respondent]: \"",
             "required": false,
-            "type": "text",
-            "default": "[survey respondent]: "
+            "type": "text"
         }
     ],
+    "framework-version": 12,
     "compatibility": {
-        "redcap-version-min": "9.3.6"
+        "redcap-version-min": "13.1.0",
+        "php-version-min": "7.4.0"
     }
-
 }

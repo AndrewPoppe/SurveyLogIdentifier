@@ -3,75 +3,71 @@ namespace SurveyLogIdentifierNamespace\SurveyLogIdentifier;
 
 
 use ExternalModules\AbstractExternalModule;
-use ExternalModules\ExternalModules;
+use ExternalModules\Framework;
 
 use REDCap;
 
-class SurveyLogIdentifier extends \ExternalModules\AbstractExternalModule {
+/**
+ * @property Framework $framework
+ * @see Framework
+ */
+class SurveyLogIdentifier extends AbstractExternalModule {
 
-    function redcap_save_record($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance)
+    public function redcap_save_record($projectId, $record, $instrument, $eventId, $groupId, $surveyHash, $responseId, $repeatInstance)
     {
         
         // get id-field setting
-        $id_field = AbstractExternalModule::getProjectSetting("id-field");
-        if (is_null($id_field) || $id_field == "") $id_field = REDCap::getRecordIdField();
+        $idField = $this->framework->getProjectSetting("id-field") ?? $this->framework->getRecordIdField();
 
         // get prefix setting
-        $prefix = REDCap::escapeHtml(AbstractExternalModule::getProjectSetting("id-prefix"));
-        if (is_null($prefix)) $prefix = "[survey respondent]: ";
+        $prefix = $this->framework->escape($this->framework->getProjectSetting("id-prefix")) ?? "[survey respondent]: ";
 
         // get instrument(s) setting
-        $instruments = AbstractExternalModule::getProjectSetting("instrument");
-        if (is_null($instruments) || is_null($instruments[0])) $instruments = [""];
+        $instruments = $this->framework->getProjectSetting("instrument") ?? [""];
+        $this->framework->log('ok', ['instruments' => json_encode($instruments)]);
 
         $index = array_search($instrument, $instruments);
-        if ($index === FALSE && $instruments[0] !== "") {
+        if ($index === false && !empty($instruments[0])) {
             return 0;
         }
 
-        $log_event_table = method_exists('REDCap', 'getLogEventTable') ? REDCap::getLogEventTable($project_id) : "redcap_log_event";
-        $msql = "SELECT * FROM ".db_escape($log_event_table)." WHERE project_id = ".db_escape($project_id)." ORDER BY log_event_id DESC LIMIT 1";
-        $res = db_fetch_array(db_query($msql));
+        $logTable = $this->framework->getProject()->getLogTable();
+        $sql = "SELECT * FROM $logTable WHERE project_id = ? ORDER BY log_event_id DESC LIMIT 1";
+        $queryParams = [ $projectId ];
+        $res = $this->framework->query($sql, $queryParams)->fetch_assoc();
+
         $descs = array("Create survey response", "Update survey response");
-        $params = array('project_id'=>$project_id, 'return format'=>'array', 'records'=>array($record), 'fields'=>array($id_field), 'events'=>array($event_id));
-        $identifier = REDCap::getData($params)[$record][$event_id][$id_field];
-        $id = $prefix . $identifier; 
+        
+        $dataParams = array('project_id'=>$projectId, 'return format'=>'array', 'records'=>array($record), 'fields'=>array($idField), 'events'=>array($eventId));
+        $identifier = REDCap::getData($dataParams)[$record][$eventId][$idField];
+        $id = $prefix . $identifier;
+
         if (in_array($res["description"],  $descs)) {
 
             // Try to just update value in existing log entry
-            $log_event_id_orig = $res["log_event_id"];
-            $newsql = "UPDATE ".db_escape($log_event_table)." SET user='".db_escape($id)."' WHERE log_event_id=".db_escape($log_event_id_orig);
-            $update_res = db_query($newsql);
+            $logEventIdOrig = $res["log_event_id"];
+            $newSql = "UPDATE $logTable SET user = ? WHERE log_event_id = ?";
+            $newParams = [ $id, $logEventIdOrig ];
+            $updateRes = $this->framework->query($newSql, $newParams);
 
-            if (!$update_res) {
+            if (!$updateRes) {
                 // Fallback on logEvent from REDCap class
-                REDCap::logEvent($id . "\n" . $desc, $res["data_values"], $res["sql_log"], $res["pk"], "", $res["project_id"]);
+                $descriptionLog = $id . "\n" . $res["description"];
+                $changesLog = $res["data_values"];
+                $sqlLog = $res["sql_log"];
+                $recordLog = $res["pk"];
+                $eventLog = $eventId;
+                $pidLog = $res["project_id"];
+
+                REDCap::logEvent(
+                    $descriptionLog,
+                    $changesLog,
+                    $sqlLog,
+                    $recordLog,
+                    $eventLog,
+                    $pidLog
+                );
             }
-
-            /*if (!$update_res) {
-                // Create new log row
-                $desc = $res["description"];
-                $new_res = Logging::logEvent($res["sql_log"], 
-                            $res["object_type"], 
-                            $res["event"],  
-                            $res["pk"], 
-                            $res["data_values"], 
-                            $description,  
-                            $res["change_reason"], 
-                            $id, 
-                            $res["project_id"]);
-
-                if ($new_res) {
-                    // Delete original log row
-                    $logid = $res["log_event_id"];
-                    $del_sql = "DELETE FROM $log_event_table WHERE project_id = $project_id AND log_event_id = $logid;";
-                    db_query($del_sql);
-                } else {
-                    // Fallback on logEvent from REDCap class
-                    REDCap::logEvent($desc, $res["data_values"], $res["sql_log"], $res["pk"], "", $res["project_id"]);
-                }
-
-            }*/
         }
     }
 
