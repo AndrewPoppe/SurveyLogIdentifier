@@ -24,7 +24,6 @@ class SurveyLogIdentifier extends AbstractExternalModule {
 
         // get instrument(s) setting
         $instruments = $this->framework->getProjectSetting("instrument") ?? [""];
-        $this->framework->log('ok', ['instruments' => json_encode($instruments)]);
 
         $index = array_search($instrument, $instruments);
         if ($index === false && !empty($instruments[0])) {
